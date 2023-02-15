@@ -2,28 +2,27 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use App\Service\PaymentService;
+use App\Enums\PaymentStatusEnum;
+use App\Services\PaymentService;
+use App\Services\CourseUserService;
 use YooKassa\Model\NotificationEventType;
 use YooKassa\Model\Notification\NotificationSucceeded;
 use YooKassa\Model\Notification\NotificationWaitingForCapture;
-use App\Enums\PaymentStatusEnum;
 
 class PaymentController extends Controller
 {
-    public function index(){
-        $transactions = Transaction::all();
-        return view('main', ['transactions' => $transactions]);
-    }
-
     public function create(Request $request, PaymentService $paymentService){
         $amount = $request->amount;
-        $descr = 'Пополнение баланса';
+        $descr = $request->descr;
 
         $transaction = Transaction::create([
             'amount' => $amount,
-            'descr' => $descr
+            'descr' => $descr,
+            'user_id' => $request->user_id,
+            'course_id' => $request->course_id,
         ]);
 
         if($transaction){
@@ -40,12 +39,17 @@ class PaymentController extends Controller
         $source = file_get_contents('php://input');
         $requestBody = json_decode($source, true);
 
-
-        $notification = ($requestBody['event'] === NotificationEventType::PAYMENT_SUCCEEDED)
+        $notification = (isset($requestBody['event']) && $requestBody['event'] === NotificationEventType::PAYMENT_SUCCEEDED)
             ? new NotificationSucceeded($requestBody)
             : new NotificationWaitingForCapture($requestBody);
-        
         $payment = $notification->getObject();
+
+        if(isset($payment->status) && $payment->status === 'waiting_for_capture'){
+             $paymentService->getClient()->capturePayment([
+                'amount' => $payment->amount,
+            ], $payment->id, uniqid('', true));
+        }
+
         if(isset($payment) && $payment->status === 'succeeded'){
             if($payment->paid === true){
                 $metadata = (object)$payment->metadata;
@@ -54,6 +58,7 @@ class PaymentController extends Controller
                     $transaction = Transaction::find($transactionId);
                     $transaction->status = PaymentStatusEnum::CONFIRMED;
                     $transaction->save();
+                    CourseUserService::giveAccess($transaction->course_id, $transaction->user_id);
                 }
             }
         }

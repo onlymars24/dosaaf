@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 use YooKassa\Client;
 
 class PaymentService{
     
-    private function getClient(): Client{
+    public function getClient(): Client{
         $client = new Client();
         $client->setAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'));
         return $client;
@@ -21,10 +21,10 @@ class PaymentService{
                 ],
                 'confirmation' => [
                     'type' => 'redirect',
-                    'return_url' => route('payment.callback'),
+                    'return_url' => route('my.courses'),
                 ],
                 'capture' => false,
-                'description' => 'Заказ №1',
+                'description' => $descr,
                 'metadata' => [
                     'transaction_id' => $options['transaction_id'],
                 ]

@@ -30,7 +30,7 @@
             <div class="block-right__card">
               <div class="card__img" style="background-image: url(/{{$course->avatar}});"></div>
               <h2 class="card__header">
-              {{$course->title}}
+              ID{{$course->id}}<br> {{$course->title}}
               </h2>
               <div class="card__information">
                 <span class="card__price">Цена: <span class="price__value">{{$course->price}}₽</span></span>

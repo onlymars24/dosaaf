@@ -25,7 +25,14 @@
           @auth
           @if(Auth::user()->status == 'natural')
           <div class="card__complete-training">
-            <a href="/more-detailed.html" disabled>Приобрести курс</a>
+            <form class="card__complete-training" action="{{route('payment.create')}}" method="POST">
+              @csrf
+              <input type="hidden" value="{{$course->price}}" name="amount">
+              <input type="hidden" value="{{$descr_for_pay}}" name="descr">
+              <input type="hidden" value="{{$course->id}}" name="course_id">
+              <input type="hidden" value="{{Auth::user()->id}}" name="user_id">
+              <button class="card__complete-training">Приобрести курс</button>
+            </form>
           </div>
           @elseif(Auth::user()->status == 'legal')
           <div class="payment" id="pay-but">

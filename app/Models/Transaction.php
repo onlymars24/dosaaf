@@ -12,7 +12,9 @@ class Transaction extends Model
     protected $fillable = [
         'amount',
         'descr',
-        'status'
+        'status',
+        'course_id',
+        'user_id'
     ];
 
 }

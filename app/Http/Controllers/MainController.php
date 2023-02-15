@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class MainController extends Controller
 {
     public function main(Request $request){
+
         $conditions = [
             ['hidden', '=', 0]
         ];
@@ -29,6 +30,7 @@ class MainController extends Controller
         }
         $types = Type::has('courses')->get();
         $categories = Category::has('courses')->get();
+        // \Log::info('Информация:', [$categories]);        
         return view('main', [
             'courses' => $courses,
             'types' => $types,
