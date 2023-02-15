@@ -265,5 +265,5 @@ Route::get('/clear', function() {
 
 
 
-Route::match(['GET', 'POST'], '/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
-Route::match(['GET', 'POST'], '/payment/create', [PaymentController::class, 'create'])->name('payment.create');
+Route::post('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+Route::post('/payment/create', [PaymentController::class, 'create'])->name('payment.create');

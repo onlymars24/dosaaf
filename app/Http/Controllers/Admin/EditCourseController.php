@@ -70,7 +70,7 @@ class EditCourseController extends Controller
         }
         $course->docs = $docs;
         $course->save();
-        if(Finish::where([['course_id', '=', $id], ['passed', '=', false]])->first()){
+        if(Finish::where(['course_id', '=', $id])->first()){
             return redirect()->route('admin.catalog');
         }
         return redirect()->route('admin.edit.modules', ['id' => $course->id]);
